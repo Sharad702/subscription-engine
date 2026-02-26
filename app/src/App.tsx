@@ -30,6 +30,20 @@ const LAMPORTS_PER_SOL = 1e9;
 const DEVNET_EXPLORER = 'https://explorer.solana.com/tx';
 const PLAN_NAMES_KEY = 'sub-eng-plan-names';
 
+/** Extract user-friendly message from Anchor/program errors */
+function formatProgramError(raw: string): string {
+  const anchorMsg = raw.match(/Error Message:\s*(.+)/s);
+  if (anchorMsg?.[1]) return anchorMsg[1].trim();
+  if (raw.includes('RenewalTooEarly')) return 'Wait until your next billing date to renew. Check My Subscriptions for the date.';
+  if (raw.includes('NotActive')) return 'This subscription is not active (cancelled or closed).';
+  if (raw.includes('PlanInactive')) return 'This plan is no longer accepting subscriptions.';
+  if (raw.includes('PlanStillActive')) return 'Deactivate the plan first, then close it to reclaim rent.';
+  if (raw.includes('SubscriptionExpired')) return 'Subscription has expired or is inactive.';
+  if (raw.includes('InvalidInterval')) return 'Billing interval must be greater than zero.';
+  if (raw.includes('NameTooLong')) return 'Plan name must be 64 characters or less.';
+  return raw;
+}
+
 function getStoredPlanNames(): Record<string, string> {
   try {
     return JSON.parse(localStorage.getItem(PLAN_NAMES_KEY) || '{}');
@@ -215,7 +229,7 @@ function App() {
         } else if (msg.includes('PlanStillActive') || msg.includes('Plan must be inactive')) {
           setError('Deactivate the plan first, then close it to reclaim rent.');
         } else {
-          setError(msg);
+          setError(formatProgramError(msg));
         }
       } finally {
         setLoading(false);

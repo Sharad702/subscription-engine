@@ -318,19 +318,19 @@ pub struct Subscription {
 
 #[error_code]
 pub enum SubscriptionError {
-    #[msg("Interval must be positive")]
+    #[msg("Billing interval must be greater than zero")]
     InvalidInterval,
-    #[msg("Plan is not active")]
+    #[msg("This plan is no longer accepting subscriptions")]
     PlanInactive,
-    #[msg("Plan must be inactive to close")]
+    #[msg("Deactivate the plan first, then close it to reclaim rent")]
     PlanStillActive,
-    #[msg("Subscription is not active")]
+    #[msg("This subscription is not active (cancelled or closed)")]
     NotActive,
-    #[msg("Cannot renew before next billing time")]
+    #[msg("Wait until your next billing date to renew. Check My Subscriptions for the date.")]
     RenewalTooEarly,
-    #[msg("Arithmetic overflow")]
+    #[msg("An overflow occurred. Please try again.")]
     Overflow,
-    #[msg("Subscription expired or inactive")]
+    #[msg("Subscription has expired or is inactive")]
     SubscriptionExpired,
     #[msg("Plan name must be 64 characters or less")]
     NameTooLong,
