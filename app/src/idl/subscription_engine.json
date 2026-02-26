@@ -1,0 +1,644 @@
+{
+  "address": "CA9TkuW8WjA7q53piQgG7tYGw3DkZG7tMXoK8aDPxtRM",
+  "metadata": {
+    "name": "subscription_engine",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "cancel",
+      "docs": [
+        "Cancel subscription (no refund)."
+      ],
+      "discriminator": [
+        232,
+        219,
+        223,
+        41,
+        219,
+        236,
+        220,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "subscription",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscriber"
+              },
+              {
+                "kind": "account",
+                "path": "plan"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subscriber",
+          "signer": true
+        },
+        {
+          "name": "plan"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "check_access",
+      "docs": [
+        "Trustless access check: anyone can call to verify a subscription is active and not expired.",
+        "Fails with SubscriptionExpired if status != Active or current time >= next_billing_at (period end)."
+      ],
+      "discriminator": [
+        74,
+        62,
+        42,
+        188,
+        96,
+        229,
+        63,
+        50
+      ],
+      "accounts": [
+        {
+          "name": "subscription",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscription.subscriber",
+                "account": "Subscription"
+              },
+              {
+                "kind": "account",
+                "path": "subscription.plan",
+                "account": "Subscription"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_plan",
+      "docs": [
+        "Close a plan (merchant only). Reclaims rent to merchant. Plan must be inactive."
+      ],
+      "discriminator": [
+        45,
+        137,
+        184,
+        220,
+        162,
+        253,
+        161,
+        8
+      ],
+      "accounts": [
+        {
+          "name": "plan",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant"
+              },
+              {
+                "kind": "arg",
+                "path": "plan_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "merchant",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "_plan_id",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "close_subscription",
+      "docs": [
+        "Close a cancelled subscription. Reclaims rent to subscriber."
+      ],
+      "discriminator": [
+        33,
+        214,
+        169,
+        135,
+        35,
+        127,
+        78,
+        7
+      ],
+      "accounts": [
+        {
+          "name": "subscription",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscriber"
+              },
+              {
+                "kind": "account",
+                "path": "plan"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subscriber",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "plan"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_plan",
+      "docs": [
+        "Create a billing plan (merchant only)."
+      ],
+      "discriminator": [
+        77,
+        43,
+        141,
+        254,
+        212,
+        118,
+        41,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "plan",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant"
+              },
+              {
+                "kind": "arg",
+                "path": "plan_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "merchant",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "plan_id",
+          "type": "u16"
+        },
+        {
+          "name": "amount_lamports",
+          "type": "u64"
+        },
+        {
+          "name": "interval_secs",
+          "type": "i64"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_subscription",
+      "docs": [
+        "Subscribe to a plan (first period paid at creation)."
+      ],
+      "discriminator": [
+        65,
+        71,
+        10,
+        60,
+        249,
+        82,
+        197,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "subscription",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscriber"
+              },
+              {
+                "kind": "account",
+                "path": "plan"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subscriber",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "plan"
+        },
+        {
+          "name": "merchant",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deactivate_plan",
+      "docs": [
+        "Deactivate a plan (merchant only). No new subscriptions; existing can renew until closed."
+      ],
+      "discriminator": [
+        91,
+        38,
+        214,
+        232,
+        172,
+        21,
+        30,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "plan",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant"
+              },
+              {
+                "kind": "arg",
+                "path": "plan_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "merchant",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "renew",
+      "docs": [
+        "Renew subscription when current time >= next_billing_at."
+      ],
+      "discriminator": [
+        43,
+        239,
+        15,
+        46,
+        27,
+        7,
+        163,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "subscription",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  115,
+                  99,
+                  114,
+                  105,
+                  112,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subscriber"
+              },
+              {
+                "kind": "account",
+                "path": "plan"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subscriber",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "plan"
+        },
+        {
+          "name": "merchant",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Plan",
+      "discriminator": [
+        161,
+        231,
+        251,
+        119,
+        2,
+        12,
+        162,
+        2
+      ]
+    },
+    {
+      "name": "Subscription",
+      "discriminator": [
+        64,
+        7,
+        26,
+        135,
+        102,
+        132,
+        98,
+        33
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidInterval",
+      "msg": "Interval must be positive"
+    },
+    {
+      "code": 6001,
+      "name": "PlanInactive",
+      "msg": "Plan is not active"
+    },
+    {
+      "code": 6002,
+      "name": "PlanStillActive",
+      "msg": "Plan must be inactive to close"
+    },
+    {
+      "code": 6003,
+      "name": "NotActive",
+      "msg": "Subscription is not active"
+    },
+    {
+      "code": 6004,
+      "name": "RenewalTooEarly",
+      "msg": "Cannot renew before next billing time"
+    },
+    {
+      "code": 6005,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6006,
+      "name": "SubscriptionExpired",
+      "msg": "Subscription expired or inactive"
+    },
+    {
+      "code": 6007,
+      "name": "NameTooLong",
+      "msg": "Plan name must be 64 characters or less"
+    }
+  ],
+  "types": [
+    {
+      "name": "Plan",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "merchant",
+            "type": "pubkey"
+          },
+          {
+            "name": "plan_id",
+            "type": "u16"
+          },
+          {
+            "name": "amount_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "interval_secs",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Subscription",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subscriber",
+            "type": "pubkey"
+          },
+          {
+            "name": "plan",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "interval_secs",
+            "type": "i64"
+          },
+          {
+            "name": "next_billing_at",
+            "type": "i64"
+          },
+          {
+            "name": "started_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "auto_renew",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
