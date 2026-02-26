@@ -3,7 +3,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { AnchorProvider, BN } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getPlanPda, getSubscriptionPda, getProgram, PROGRAM_ID } from './lib/program';
+import { getPlanPda, getSubscriptionPda, getProgram} from './lib/program';
 import './App.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
